@@ -11,6 +11,7 @@ site.retry
 # Real database, file backup for 'restore=true' runs
 backup/*
 !backup/README.md
+!backup/var/www/.gitkeep
 
 # Real config values
 group_vars/*
