@@ -1,0 +1,28 @@
+- name: application databases are created
+  mysql_db: name={{ item }} state=present
+  tags: mariadb
+  with_items:
+  - 
+
+
+   - git
+   - php5-redis
+   
+   
+   
+- name: Copy the code from repository
+  git: repo={{ auth_repository }} dest=/usr/share/auth-web
+
+- name: Create symlink to auth
+  file: src=/usr/share/auth-web/www/a dest=/var/www/html/a state=link
+
+- name: Add auth-web apache conf
+  template: src=auth-web.conf dest=/etc/apache2/sites-available/auth-web.conf owner=www-data group=www-data mode=0644
+  notify: reload apache
+
+- name: Enable auth-web site
+  command: a2ensite auth-web
+  args:
+    creates: /etc/apache2/sites-enabled/auth-web.conf
+
+# TODO set up site, redirects, other stuff.

@@ -1,0 +1,58 @@
+---
+- name: apache and related packages are installed
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+   - apache2
+   - libapache2-mod-php5
+   - php5
+   - php5-cli
+   - php5-mysql
+
+- name: mod_ssl is disabled
+  apache2_module: state=absent name=ssl
+  notify: restart apache
+
+- name: apache extensions are enabled
+  command: a2enmod {{ item }}
+  args:
+    creates: /etc/apache2/mods-enabled/{{ item }}.load
+  with_items:
+   - rewrite
+  notify: restart apache
+
+- name: default apache site is disabled
+  command: a2dissite 000-default
+  args:
+    removes: /etc/apache2/sites-enabled/000-default.conf
+
+- name: apache ports are configured
+  template:
+    src: ports.conf.j2
+    dest: /etc/apache2/ports.conf
+  notify: restart apache
+  tags: tls-upgrade
+
+- name: apache sites are installed
+  template: src={{ item }}.conf.j2 dest=/etc/apache2/sites-available/{{ item }}.conf owner=www-data group=www-data mode=0644
+  with_items:
+   - 001-wikimedia.org.au
+  notify: reload apache
+  tags: tls-upgrade
+
+- name: apache sites are enabled
+  command: a2ensite {{ item }}
+  args:
+    creates: /etc/apache2/sites-enabled/{{ item }}.conf
+  with_items:
+   - 001-wikimedia.org.au
+  notify: reload apache
+  tags: tls-upgrade
+
+- name: apache is running and enabled
+  service: name=apache2 state=running enabled=yes
+
+- name: firewall services are enabled
+  firewalld: service={{item}} zone=public permanent=true state=enabled immediate=true
+  with_items:
+   - http
+   - https

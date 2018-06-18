@@ -1,0 +1,97 @@
+# nginx installer TODO items
+#  - swap use of rapidssl with new letsencrypt cert
+#  - add IF statements for using snake-oil certs during bootstrap
+#  - tls certs for more domains
+#  - split out virtual hosts into files (make lists in vars)
+
+- name: nginx and tls-related packages are installed
+  package: name="{{ item }}" state=present
+  with_items:
+  - nginx
+  - ssl-cert
+  - openssl
+
+# TODO will be obsolete soon
+- include: rapidssl.yml
+
+- name: python certbot nginx
+  apt:
+    name: python-certbot-nginx
+    state: present
+    default_release: jessie-backports
+  tags: tls
+
+- name: nginx default virtual host is disabled
+  file: dest=/etc/nginx/sites-enabled/default state=absent
+
+- name: dhparam generated
+  command: openssl dhparam -dsaparam -out /etc/ssl/dhparam.pem 4096
+  args:
+    creates: /etc/ssl/dhparam.pem
+
+- name: Check that the cert exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ wmau_domain }}/cert.pem"
+  register: real_cert
+  tags: tls
+
+- name: nginx webroot exists
+  file: dest=/var/www/nginx/ state=directory
+
+# Apply virtual host configs in two steps- this allows snake-oil certificates
+# to be used for the ACME negotiation, with real ones saved over it.
+- set_fact:
+    is_snakeoil: "{{ real_cert.stat.exists == False or tls_selfsign == True }}"
+  tags: tls
+
+- name: nginx virtual hosts are configured (step 1 of 2)
+  template:
+    src: "{{ item.number }}-{{ item.name }}.ssl.conf.j2"
+    dest: "/etc/nginx/sites-available/{{ item.number }}-{{ item.name }}.ssl.conf"
+  with_items: "{{ subdomains }}"
+  notify: reload nginx
+
+- name: nginx virtual hosts are enabled
+  file:
+    src: "/etc/nginx/sites-available/{{ item.number }}-{{ item.name }}.ssl.conf"
+    dest: "/etc/nginx/sites-enabled/{{ item.number }}-{{ item.name }}.ssl.conf"
+    state: link
+  with_items: "{{ subdomains }}"
+  notify: reload nginx
+
+- meta: flush_handlers
+  tags: tls
+
+- name: nginx is running and enabled
+  service: name=nginx state=running enabled=yes
+
+- name: TLS certificates are available for each subdomain
+  command: "certbot certonly --nginx -n -d {{ item }} -m tech@{{ wmau_domain }} --agree-tos"
+  args:
+    creates: /etc/letsencrypt/live/{{ item }}/cert.pem
+  with_items:
+  - "{{ wmau_domain }}"
+  - "comm.{{ wmau_domain }}"
+  - "civicrm.{{ wmau_domain }}"
+  - "blog.{{ wmau_domain }}"
+  - "lists.{{ wmau_domain }}"
+  - "mail.{{ wmau_domain }}"
+  - "tech.{{ wmau_domain }}"
+  - "www.{{ wmau_domain }}"
+  when: tls_selfsign != True
+  tags: add-tls-domain
+
+- set_fact:
+    is_snakeoil: "{{ tls_selfsign == True }}"
+  tags: tls
+
+- name: nginx virtual hosts are configured (step 2 of 2)
+  template:
+    src: "{{ item.number }}-{{ item.name }}.ssl.conf.j2"
+    dest: "/etc/nginx/sites-available/{{ item.number }}-{{ item.name }}.ssl.conf"
+  with_items: "{{ subdomains }}"
+  notify: reload nginx
+
+#TODO might need to splat over the cron entry if it doesn't reload nginx for us
+# manuall triggers fine with
+#  - command: certbot renew --post-hook "service nginx reload" --force-renewal

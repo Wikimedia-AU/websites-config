@@ -1,0 +1,10 @@
+# Handles upload and management of RapidSSL cert, ued up until 2017-06-15.
+- name: disused certs and keys are shredded
+  command: shred -zu "{{ item }}"
+  args:
+    removes: "{{ item }}"
+  with_items:
+   - /etc/ssl/certs/rapidssl-intermediate-ca.cer
+   - /etc/ssl/certs/wikimedia.org.au.cer
+   - /etc/ssl/private/wmau-privatekey.key
+   - /etc/ssl/certs/wikimedia.org.au.combined.cer

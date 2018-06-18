@@ -1,0 +1,38 @@
+---
+- name: restart apache
+  service: name=apache2 state=restarted
+
+- name: reload apache
+  service: name=apache2 state=reloaded
+
+- name: www permission
+  command: chown -R www-data:www-data /var/www/html/
+
+- name: update mediawiki composer deps
+  shell: cd /srv/mediawiki && /usr/local/bin/composer update --no-dev
+  register: composer_install_output
+  become_user: www-data
+
+- name: update mediawiki
+  shell: cd /srv/mediawiki/maintenance && WIKI={{ item }} php update.php --quick
+  become_user: www-data
+  with_items:
+  - officialwiki
+  - ngwiki
+  - nyswiki
+  - commwiki
+
+# Images & javascript cache
+- name: clear mw file cache
+  shell: rm --preserve-root -Rf {{ item }}
+  with_items:
+   - /var/www/html/wikimedia.org.au/w/images/cache
+
+- name: clear mw parser cache
+  shell: cd /srv/mediawiki/maintenance && WIKI={{ item }} php purgeParserCache.php --age 0
+  become_user: www-data
+  with_items:
+  - officialwiki
+  - ngwiki
+  - nyswiki
+  - commwiki

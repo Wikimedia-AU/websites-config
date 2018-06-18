@@ -1,0 +1,10 @@
+---
+- name: set hostname
+  hostname: name={{ inventory_hostname }}
+
+- include: apt.yml
+- include: sshd.yml
+- include: selinux.yml
+- include: ntp.yml
+- include: firewalld.yml
+

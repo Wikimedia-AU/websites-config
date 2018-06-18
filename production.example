@@ -1,0 +1,10 @@
+[all:vars]
+wmau_domain=wikimedia.org.au
+tls_selfsign=False
+
+[web]
+osiris.wikimedia.org.au ansible_connection=ssh set_remote_user=no
+
+[backup]
+#horus.wikimedia.org.au ansible_connection=ssh
+

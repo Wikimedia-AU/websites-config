@@ -1,0 +1,13 @@
+---
+- name: restart ntp
+  service: name=ntp state=restarted
+
+- name: restart sshd
+  service: name=sshd state=restarted
+
+# TODO not yet used
+#- name: restart iptables
+#  service: name=iptables state=restarted
+#
+#- name: restart iptables
+#  service: name=iptables state=restarted

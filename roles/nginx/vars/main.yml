@@ -1,0 +1,9 @@
+subdomains:
+- { number: "001", name: wikimedia.org.au }
+- { number: "002", name: comm.wikimedia.org.au }
+- { number: "003", name: blog.wikimedia.org.au }
+- { number: "004", name: civicrm.wikimedia.org.au }
+- { number: "005", name: www.wikimedia.org.au }
+- { number: "006", name: tech.wikimedia.org.au }
+- { number: "007", name: mail.wikimedia.org.au }
+- { number: "008", name: lists.wikimedia.org.au }

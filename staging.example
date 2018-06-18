@@ -1,0 +1,10 @@
+[all:vars]
+wmau_domain=mikevm
+tls_selfsign=True
+
+[web]
+mikevm ansible_connection=ssh
+
+[backup]
+#pimike2 ansible_connection=ssh
+

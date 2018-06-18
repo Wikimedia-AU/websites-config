@@ -1,0 +1,16 @@
+---
+# NB: 2015-12-31- This file is a placeholder only.
+# We're not configuring SELinux due to the missing default policy on Debian Jessie.
+# https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=selinux-policy-default;dist=unstable
+#
+#- name: selinux packages are installed
+#  apt: package={{ item }} state=present update_cache=no
+#  with_items:
+#   - selinux-basics
+#   - selinux-policy-default
+#   - auditd
+#   - python-selinux
+#
+#- name: selinux is set to permissive
+#  selinux: policy=default state=enforcing
+#

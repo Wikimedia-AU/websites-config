@@ -1,0 +1,9 @@
+---
+- name: firewalld is installed
+  apt: package=firewalld state=present update_cache=no
+  tags: firewalld
+
+- name: firewalld is running and enabled
+  service: name=firewalld state=running enabled=yes
+  tags: firewalld
+

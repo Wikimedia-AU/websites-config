@@ -1,0 +1,56 @@
+mariadb_host: localhost
+mariadb_root_password: 
+
+app_db_user: 
+app_db_pass: 
+
+# Drupal/CiviCRM
+drupal_db: 
+drupal_db_user: 
+drupal_db_pass: 
+civicrm_db: 
+civicrm_db_user: 
+civicrm_db_pass: 
+drupal_hash_salt: 
+drupal_civicrm_site_key: 
+
+wordpress_db: 
+wordpress_db_user: 
+wordpress_db_pass: 
+wordpress_AUTH_KEY: 
+wordpress_SECURE_AUTH_KEY: 
+wordpress_LOGGED_IN_KEY: 
+wordpress_NONCE_KEY: 
+wordpress_AUTH_SALT: 
+wordpress_SECURE_AUTH_SALT: 
+wordpress_LOGGED_IN_SALT: 
+wordpress_NONCE_SALT: 
+
+# Wiki farm
+officialwiki_db: 
+officialwiki_db_user: 
+officialwiki_db_pass: 
+officialwiki_proxy_key: 
+
+commwiki_db: 
+commwiki_db_user: 
+commwiki_db_pass: 
+commwiki_proxy_key: 
+
+nyswiki_db: 
+nyswiki_prefix: 
+nyswiki_db_user: 
+nyswiki_db_pass: 
+nyswiki_upgradekey: 
+nyswiki_secretkey: 
+
+ngwiki_db: 
+ngwiki_db_user: 
+ngwiki_db_pass: 
+ngwiki_prefix: 
+ngwiki_upgradekey: 
+ngwiki_secretkey: 
+
+# 'true' to log MediaWiki output to /var/log/mediawiki/
+mw_debug: true
+mw_version: REL1_28

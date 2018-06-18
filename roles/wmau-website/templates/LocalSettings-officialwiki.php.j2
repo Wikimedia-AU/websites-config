@@ -1,0 +1,281 @@
+<?php
+$wgSitename         = "Wikimedia Australia";
+
+## The URL base path to the directory containing the wiki;
+## defaults for all runtime URL paths are based off of this.
+$wgScriptPath       = "/w";
+$wgScriptExtension  = ".php";
+$wgArticlePath = "/wiki/$1"; 
+$wgServer          = "https://{{ wmau_domain }}";
+$wgUploadDirectory = "/var/www/html/wikimedia.org.au/w/images/";
+$wgUploadPath = "{$wgScriptPath}/images";
+
+## For more information on customizing the URLs please see:
+## http://www.mediawiki.org/wiki/Manual:Short_URL
+
+$wgEnableEmail      = true;
+$wgEnableUserEmail  = true;
+
+$wgEmergencyContact = "tech@wikimedia.org.au";
+$wgPasswordSender = "tech@wikimedia.org.au";
+
+## For a detailed description of the following switches see
+## http://www.mediawiki.org/wiki/Extension:Email_notification 
+## and http://www.mediawiki.org/wiki/Extension:Email_notification
+## There are many more options for fine tuning available see
+## /includes/DefaultSettings.php
+## UPO means: this is also a user preference option
+$wgEnotifUserTalk = true; # UPO
+$wgEnotifWatchlist = true; # UPO
+$wgEmailAuthentication = true;
+
+$wgDBtype           = "mysql";
+$wgDBserver         = "localhost";
+$wgDBname           = "{{ officialwiki_db }}";
+$wgDBuser           = "{{ officialwiki_db_user }}";
+$wgDBpassword       = "{{ officialwiki_db_pass }}";
+
+# MySQL specific settings
+$wgDBprefix         = "";
+
+# MySQL table options to use during installation or update
+$wgDBTableOptions   = "TYPE=InnoDB";
+
+# Experimental charset support for MySQL 4.1/5.0.
+$wgDBmysql5 = false;
+
+# Postgres specific settings
+$wgDBport           = "5432";
+$wgDBmwschema       = "mediawiki";
+$wgDBts2schema      = "public";
+
+## Shared memory settings
+$wgMainCacheType = CACHE_NONE;
+$wgMemCachedServers = array();
+
+## To enable image uploads, make sure the 'images' directory
+## is writable, then set this to true:
+$wgEnableUploads       = true;
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = "/usr/bin/convert";
+
+## If you want to use image uploads under safe mode,
+## create the directories images/archive, images/thumb and
+## images/temp, and make them all writable. Then uncomment
+## this, if it's not already uncommented:
+# $wgHashedUploadDirectory = false;
+
+## If you have the appropriate support software installed
+## you can enable inline LaTeX equations:
+$wgUseTeX           = false;
+
+$wgLocalInterwiki   = $wgSitename;
+
+$wgLanguageCode = "en";
+
+$wgProxyKey = "{{ officialwiki_proxy_key }}";
+
+## Default skin: you can change the default skin. Use the internal symbolic
+## names, ie 'standard', 'nostalgia', 'cologneblue', 'monobook':
+$wgDefaultSkin = 'vector';
+
+## For attaching licensing metadata to pages, and displaying an
+## appropriate copyright notice / icon. GNU Free Documentation
+## License and Creative Commons licenses are supported so far.
+$wgEnableCreativeCommonsRdf = true;
+$wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
+$wgRightsUrl = "http://creativecommons.org/licenses/by-sa/3.0/";
+$wgRightsText = "Attribution-ShareAlike 3.0 Unported";
+#$wgRightsIcon = "${wgScriptPath}/skins/common/images/CC-SA.png";
+# $wgRightsCode = "gfdl"; # Not yet used
+
+$wgDiff3 = "/usr/bin/diff3";
+
+## To enable image uploads, make sure the 'images' directory
+## is writable, then set this to true:
+$wgEnableUploads       = true;
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = "/usr/bin/convert";
+
+
+$wgGroupPermissions['*']['edit']    = false;
+$wgGroupPermissions['*']['createaccount']    = false;
+
+$wgGroupPermissions['financial'] = $wgGroupPermissions['user'];
+$wgGroupPermissions['financial' ]['edit']    = true;
+$wgGroupPermissions['financial']['editinterface']    = true;
+
+// Permission to change users' group assignments
+$wgGroupPermissions['sysop']['userrights']  = true;
+
+
+$wgAllowUserCss = true;
+$wgAllowUserJs = true;
+
+
+define("NS_MEETING", 200);
+define("NS_MEETING_TALK", 201);
+define("NS_RESOLUTION", 202);
+define("NS_RESOLUTION_TALK", 203);
+define("NS_PROPOSAL", 204);
+define("NS_PROPOSAL_TALK", 205);
+ 
+$wgExtraNamespaces[NS_MEETING] = "Meeting";
+$wgExtraNamespaces[NS_MEETING_TALK] = "Meeting_talk";
+$wgExtraNamespaces[NS_RESOLUTION] = "Resolution";
+$wgExtraNamespaces[NS_RESOLUTION_TALK] = "Resolution_talk";
+$wgExtraNamespaces[NS_PROPOSAL] = "Proposal";
+$wgExtraNamespaces[NS_PROPOSAL_TALK] = "Proposal_talk";
+
+$wgNamespaceProtection[NS_MAIN] = $wgNamespaceProtection[NS_PROJECT] =
+$wgNamespaceProtection[NS_IMAGE] = $wgNamespaceProtection[NS_MEDIAWIKI] = $wgNamespaceProtection[NS_TEMPLATE] =
+$wgNamespaceProtection[NS_HELP] = $wgNamespaceProtection[NS_CATEGORY] = 
+$wgNamespaceProtection[NS_MEETING] = $wgNamespaceProtection[NS_RESOLUTION] = $wgNamespaceProtection[NS_PROPOSAL] =
+    array( 'edit-main' );
+// editing user pages permitted
+
+$wgGroupPermissions['financial']['edit-main'] = true; // only financial members can edit even namespaces
+
+$wgContentNamespaces = array(0,NS_MEETING,NS_RESOLUTION,NS_PROPOSAL);
+
+$wgNamespacesToBeSearchedDefault = array(
+	NS_MAIN =>           true,
+	NS_TALK =>           false,
+	NS_USER =>           false,
+	NS_USER_TALK =>      false,
+	NS_PROJECT =>        true,
+	NS_PROJECT_TALK =>   false,
+	NS_IMAGE =>          false,
+	NS_IMAGE_TALK =>     false,
+	NS_MEDIAWIKI =>      false,
+	NS_MEDIAWIKI_TALK => false,
+	NS_TEMPLATE =>       false,
+	NS_TEMPLATE_TALK =>  false,
+	NS_HELP =>           false,
+	NS_HELP_TALK =>      false,
+	NS_CATEGORY =>       false,
+	NS_CATEGORY_TALK =>  false,
+	NS_MEETING =>        true,
+	NS_MEETING_TALK =>   false,
+	NS_RESOLUTION =>     true,
+	NS_RESOLUTION_TALK => false,
+        NS_PROPOSAL =>       true,
+        NS_PROPOSAL_TALK =>  false
+);
+
+/* images and uploads */
+
+$wgFileExtensions = array( 'png', 'gif', 'jpg', 'jpeg','svg','pdf','ogg');
+
+
+/* instantcommons */
+$wgUseInstantCommons = true;
+
+/* FLAGGED REVS*/
+#include_once('extensions/FlaggedRevs/FlaggedRevs.php');
+
+$wgSimpleFlaggedRevsUI = true;
+
+$wgFlaggedRevsNamespaces = array();
+
+/* no idea wtf this does */
+$wgReviewCodes = array('gee9Shah', 'eimah2Ee');
+
+
+/* CONFIRMACCOUNT */
+require_once("$IP/extensions/ConfirmAccount/ConfirmAccount.php");
+
+$wgMakeUserPageFromBio = false;
+$wgAutoWelcomeNewUsers = false;
+$wgUseRealNamesOnly = false;
+$wgAccountRequestToS = false;
+$wgAccountRequestExtraInfo = false;
+$wgConfirmAccountSaveInfo = false;
+$wgAccountRequestMinWords = 0;
+$wgConfirmAccountContact = 'accountapprovers@wikimedia.org.au';
+$wgAllowAccountRequestFiles = false;
+
+/** Which namespaces should support subpages?
+ * See Language.php for a list of namespaces.
+ */
+$wgNamespacesWithSubpages = array(
+    NS_MAIN           => true,
+    NS_TALK           => true,
+    NS_USER           => true,
+    NS_USER_TALK      => true,
+    NS_PROJECT        => true,
+    NS_PROJECT_TALK   => true,
+    NS_IMAGE_TALK     => true,
+    NS_MEDIAWIKI_TALK => true,
+    NS_TEMPLATE_TALK  => true,
+    NS_HELP_TALK      => true,
+    NS_CATEGORY_TALK  => true,
+    NS_MEETING        => true,
+    NS_MEETING_TALK   => true,
+    NS_RESOLUTION     => true,
+    NS_RESOLUTION_TALK => true,
+    NS_PROPOSAL =>       true,
+    NS_PROPOSAL =>       true
+);
+
+$wgLogo = "{$wgUploadPath}/c/c9/Logo.png";
+
+# http://www.mediawiki.org/wiki/Extension:SpecialInterwiki
+
+require_once("$IP/extensions/Interwiki/Interwiki.php");
+$wgGroupPermissions['*']['interwiki'] = false;
+$wgGroupPermissions['sysop']['interwiki'] = true;
+
+
+$wgUseAjax = true;
+
+
+#ini_set('display_errors',true);
+#error_reporting( E_ALL);
+
+#$wgShowExceptionDetails = true;
+
+## Caching
+$wgCacheDirectory = '/tmp/mw-cache_'.$wgDBname;
+
+$wgLocaltimezone = 'Australia/Sydney';
+$oldtz = getenv("TZ");
+putenv("TZ=$wgLocaltimezone");
+# Versions before 1.7.0 used $wgLocalTZoffset as hours.
+# After 1.7.0 offset as minutes
+$wgLocalTZoffset = date("Z") / 60;
+putenv("TZ=$oldtz");
+
+$wgMiserMode = true;
+$wgDisableCounters = true;
+$wgEnableSidebarCache = true;
+#$wgUseGzip = true;
+$wgUseFileCache = false;
+
+require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
+$wgPFEnableStringFunctions = true;
+
+#require_once( "$IP/extensions/Collection/Collection.php" );
+#require_once( "$IP/extensions/CategoryTree/CategoryTree.php" );
+#require_once("$IP/extensions/Renameuser/Renameuser.php");
+require_once($IP.'/extensions/Poem/Poem.php');
+#require_once( "$IP/extensions/Gadgets/Gadgets.php" );
+
+require_once( "$IP/extensions/PdfHandler/PdfHandler.php" );
+
+#require_once ( "$IP/extensions/ContributionReporting/ContributionReporting.php" );
+
+//require_once( "$IP/extensions/WhiteListEdit/WhiteListEdit.php" );
+
+$wgWhiteListManagerGroup = 'whitelist manager';
+$wgWhiteListUsePrettyCalendar = false;
+
+$wgWhiteListOverride['always']['edit'] = array('Wikimedia_Australia:Relicensing_agreement','Billabong');
+$wgWhitelistOverride['always']['read'] = array('.*');
+
+$wgImportSources = array('commwiki','meta');
+
+require_once("$IP/extensions/Cite/Cite.php");
+require_once("$IP/extensions/ConfirmEdit/ConfirmEdit.php");
+//require_once("$IP/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php");
+require_once("$IP/extensions/InputBox/InputBox.php");

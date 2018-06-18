@@ -1,0 +1,26 @@
+## Eclipse and gedit files
+.project
+*~
+
+## Run files
+site.retry
+
+## See README.md
+## All of the files below are required, but are not tracked in git for security, privacy or practical reasons.
+
+# Real database, file backup for 'restore=true' runs
+backup/*
+!backup/README.md
+
+# Real config values
+group_vars/*
+!group_vars/web.example
+
+# Real TLS certs 
+files/*
+!files/README.md
+
+# Real inventories
+staging
+production
+

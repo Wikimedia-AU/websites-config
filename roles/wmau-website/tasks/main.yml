@@ -1,0 +1,195 @@
+---
+# Main website setup script.
+# TODO this should be chopped into sub-files, and many tasks should be given lists where they are repeated per-app or per-wiki.
+
+- name: database backup logrotate script is installed
+  template: src=wmau-db.j2 dest=/etc/logrotate.d/wmau-db
+
+- name: packages required for web apps are installed
+  apt: name={{ item }} state=present update_cache=no
+  with_items:
+   - git
+   - libav-tools
+   - liblua5.1-0
+   - php5-apcu
+   - php5-curl
+   - php5-imagick
+   - php5-intl
+   - php5-redis
+   - python3-requests
+
+- name: server dirs exist and are owned by www-data
+  file: path={{ item }} state=directory owner=www-data group=www-data
+  with_items:
+   - /srv/mediawiki
+   - /var/log/mediawiki
+   - /var/www/html/wikimedia.org.au
+   - /var/www/html/civicrm.wikimedia.org.au
+   - /var/www/html/civicrm.wikimedia.org.au/sites
+   - /var/www/html/civicrm.wikimedia.org.au/sites/default
+   - /var/www/html/comm.wikimedia.org.au
+   - /var/www/html/blog.wikimedia.org.au
+
+# MediaWiki site install procedure based on these resources
+# - https://github.com/Orain/ansible-playbook/blob/master/roles/mediawiki/tasks/packages.yml
+# - https://www.mediawiki.org/wiki/Manual_talk:Wiki_family#Multiple_Wikis.2C_one_install.2Fconfig
+- name: mediawiki debug logrotate script is installed
+  template: src=mediawiki.j2 dest=/etc/logrotate.d/mediawiki owner=root group=root mode=0644
+
+- name: mediawiki core is installed
+  git: repo=https://gerrit.wikimedia.org/r/p/mediawiki/core.git
+       dest=/srv/mediawiki
+       version={{ mw_version }}
+  become_user: www-data
+  notify:
+   - update mediawiki composer deps
+   - update mediawiki
+   - clear mw file cache
+   - clear mw parser cache
+
+- name: composer is installed
+  get_url: url=https://getcomposer.org/composer.phar dest=/usr/local/bin/composer mode=755
+
+- name: composer is up-to-date
+  action: shell /usr/local/bin/composer self-update
+  register: composer_update_output
+  changed_when: composer_update_output.stderr.find('You are already using composer version') == -1
+
+- name: composer cache directory exists
+  file: dest=/var/www/.composer state=directory owner=www-data group=www-data
+
+- name: mediawiki composer dependencies are installed
+  shell: cd /srv/mediawiki && /usr/local/bin/composer install --no-dev
+  register: composer_install_output
+  changed_when: composer_install_output.stderr.find('Nothing to install or update') == -1
+  become_user: www-data
+  notify:
+   - update mediawiki
+   - clear mw file cache
+   - clear mw parser cache
+
+- name: mediawiki extensions are installed (from gerrit, tracking current release)
+  git: repo=https://gerrit.wikimedia.org/r/mediawiki/extensions/{{item}}
+       dest=/srv/mediawiki/extensions/{{ item }}
+       version={{mw_version}}
+  with_items: "{{ extensions }}"
+  become_user: www-data
+
+- name: mediawiki extensions are installed (third party)
+  git: repo={{item.repo}}
+       dest=/srv/mediawiki/{{item.dest}}
+       version={{item.version}}
+  with_items: "{{ extensions_extra }}"
+  become_user: www-data
+  notify:
+   - update mediawiki
+   - clear mw file cache
+   - clear mw parser cache
+
+- name: mediawiki skins are installed
+  git: repo=https://gerrit.wikimedia.org/r/mediawiki/skins/{{item}}
+       dest=/srv/mediawiki/skins/{{ item }}
+       version={{mw_version}}
+  with_items: "{{ skins }}"
+  notify:
+   - update mediawiki
+   - clear mw file cache
+   - clear mw parser cache
+  become_user: www-data
+
+# TODO implement some sort of maintentance mode on apache side http://www.shellhacks.com/en/Redirect-Site-to-Maintenance-Page-using-Apache-and-HTAccess
+
+## Ok, back to MediaWiki stuff
+
+  # LocalSettings options - these are placed last to avoid downtime if extensions fail to download
+- name: wiki LocalSettings files are installed
+  template: src={{ item }}.php.j2 dest=/srv/mediawiki/{{ item }}.php owner=www-data group=www-data mode=0600
+  with_items:
+   - LocalSettings
+   - LocalSettings-officialwiki
+   - LocalSettings-commwiki
+   - LocalSettings-ngwiki
+   - LocalSettings-nyswiki
+  notify: update mediawiki
+
+- name: civicrm is configured
+  template: src={{ item }}.php.j2 dest=/var/www/html/civicrm.wikimedia.org.au/sites/default/{{ item }}.php owner=www-data group=www-data mode=0600
+  with_items:
+   - civicrm.settings
+   - settings
+
+- name: wordpress is configured
+  template: src=wp-config.php.j2 dest=/var/www/html/blog.wikimedia.org.au/wp-config.php owner=www-data group=www-data mode=0600
+
+- name: rsync passwordless sudo hack is enabled
+  template: src=extra.j2 dest=/etc/sudoers.d/extra
+  when: (restore | default('false') | bool) or (backup | default('false') | bool)
+  tags:
+   - backup
+
+- name: static artifacts are loaded from backup
+  synchronize:
+    src: backup/var/www/html
+    dest: /var/www/
+    recursive: yes
+    delete: yes
+    archive: no
+    checksum: yes
+    perms: no
+    owner: no
+    group: no
+    rsync_opts:
+     - "--exclude=civicrm.wikimedia.org.au/sites/default/civicrm.settings.php"
+     - "--exclude=civicrm.wikimedia.org.au/sites/default/settings.php"
+     - "--exclude=blog.wikimedia.org.au/wp-config.php"
+     - "--exclude=wikimedia.org.au/w/images/cache/"
+  become_user: www-data
+  notify:
+   - www permission
+   - clear mw file cache
+   - clear mw parser cache
+  when: restore | default('false') | bool
+
+- name: handlers have run
+  meta: flush_handlers
+
+- name: database backup is current
+  command: logrotate -f /etc/logrotate.d/wmau-db
+  when: backup | default('false') | bool
+  tags:
+   - mariadb
+   - backup
+
+- name: database backup is downloaded to local machine
+  fetch: src=/var/backups/wmau-db.sql.gz dest=backup/wmau.sql.gz flat=true
+  when: backup | default('false') | bool
+  tags:
+   - mariadb
+   - backup
+
+- name: static artifacts are loaded to local backup
+  synchronize:
+    mode: pull
+    src: /var/www/html
+    dest: backup/var/www/
+    recursive: yes
+    delete: yes
+    archive: no
+    checksum: yes
+    perms: no
+    owner: no
+    group: no
+    rsync_opts:
+     - "--exclude=civicrm.wikimedia.org.au/sites/default/civicrm.settings.php"
+     - "--exclude=civicrm.wikimedia.org.au/sites/default/settings.php"
+     - "--exclude=blog.wikimedia.org.au/wp-config.php"
+     - "--exclude=wikimedia.org.au/w/images/cache/"
+  when: backup | default('false') | bool
+  become_user: www-data
+  tags:
+   - backup
+
+- name: rsync passwordless sudo hack is disabled
+  file: path=/etc/sudoers.d/extra state=absent
+  tags:
+   - backup

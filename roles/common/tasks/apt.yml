@@ -1,0 +1,14 @@
+---
+- name: setting up /etc/apt/sources.list
+  template: src=sources.list.j2 dest=/etc/apt/sources.list
+
+- name: apt-get update
+  apt: update_cache=yes
+
+- name: apt https package is installed
+  package: name="{{ item }}" state=present
+  with_items:
+  - apt-transport-https
+
+- name: apt-get dist-upgrade
+  apt: upgrade=dist

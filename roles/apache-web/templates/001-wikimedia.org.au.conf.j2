@@ -1,0 +1,116 @@
+ServerName wikimedia.org.au
+
+NameVirtualHost *
+
+<VirtualHost *:8080>
+	# Main HTTP virtual host. Handle disused subdomains, redirect everything to https.
+	ServerName {{ wmau_domain }}
+	ServerAlias www.{{ wmau_domain }}
+	ServerAlias lists.{{ wmau_domain }}
+	ServerAlias mail.{{ wmau_domain }}
+	ServerAlias tech.{{ wmau_domain }}
+
+	ServerAdmin webmaster@{{ wmau_domain }}
+
+	DocumentRoot /var/www/html/wikimedia.org.au
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	# Allow MediaWiki, but disable dir listings & git sub-folder
+	<Directory /var/www/html/wikimedia.org.au>
+		Options -Indexes
+	</Directory>
+	<DirectoryMatch "^/.*/\.git+/">
+			Require all denied
+	</DirectoryMatch>
+	<Directory /srv/mediawiki>
+			Require all granted
+			Options -Indexes
+	</Directory>
+
+	RewriteEngine On
+	RewriteRule ^/$ /wiki/
+
+	# Officialwiki - everything except images to /srv/mediawiki
+	RewriteRule ^/?wiki(/.*)?$ /w/index.php
+	RewriteCond %{REQUEST_URI} !^/w/images/(.*)$
+	RewriteRule ^/w/(.*) /srv/mediawiki/$1 [E=WIKI:officialwiki,last]
+
+	# ngwiki
+	RewriteRule ^/?noongarwp(/.*)?$ /ng/index.php
+	RewriteCond %{REQUEST_URI} !^/ng/images/(.*)$
+	RewriteRule ^/ng/(.*) /srv/mediawiki/$1 [E=WIKI:ngwiki,last]
+
+	# nyswiki
+	RewriteRule ^/?nys(/.*)?$ /nys_w/index.php
+	RewriteCond %{REQUEST_URI} !^/nys_w/images/(.*)$
+	RewriteRule ^/nys_w/(.*) /srv/mediawiki/$1 [E=WIKI:nyswiki,last]
+
+	# Shortcuts
+	Redirect "/donate" "/wiki/Donate"
+	Redirect "/conf2015" "/wiki/Wikiconference_Australia_2015"
+</VirtualHost>
+
+<VirtualHost *:8080>
+	# Commwiki.
+	ServerName comm.{{ wmau_domain }}
+
+	ServerAdmin webmaster@{{ wmau_domain }}
+	DocumentRoot /var/www/html/comm.wikimedia.org.au
+
+	# Allow MediaWiki, but disable dir listings & git sub-folder
+	<Directory /var/www/html/comm.wikimedia.org.au>
+		Options -Indexes
+	</Directory>
+	<DirectoryMatch "^/.*/\.git+/">
+    	Require all denied
+	</DirectoryMatch>
+	<Directory /srv/mediawiki>
+	    Require all granted
+	    Options -Indexes
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	RewriteEngine On
+	RewriteRule ^/$ /wiki/
+
+	# commwiki
+	RewriteRule ^/?wiki(/.*)?$ /w/index.php
+	RewriteCond %{REQUEST_URI} !^/w/images/(.*)$
+	RewriteRule ^/w/(.*) /srv/mediawiki/$1 [E=WIKI:commwiki,last]
+</VirtualHost>
+
+<VirtualHost *:8080>
+	# CiviCRM (Drupal)
+	ServerName civicrm.{{ wmau_domain }}
+
+	ServerAdmin webmaster@{{ wmau_domain }}
+	DocumentRoot /var/www/html/civicrm.wikimedia.org.au
+	<Directory /var/www/html/civicrm.wikimedia.org.au>
+		Options -Indexes
+		AllowOverride All
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+<VirtualHost *:8080>
+	# Blog (Wordpress)
+	ServerName blog.{{ wmau_domain }}
+
+	ServerAdmin webmaster@{{ wmau_domain }}
+	DocumentRoot /var/www/html/blog.wikimedia.org.au
+	<Directory /var/www/html/blog.wikimedia.org.au>
+		Options -Indexes
+		AllowOverride All
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet

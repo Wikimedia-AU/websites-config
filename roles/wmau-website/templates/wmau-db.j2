@@ -1,0 +1,13 @@
+/var/backups/wmau-db.sql.gz {
+  missingok
+  daily
+  rotate 8
+  nocompress
+  create
+  postrotate
+    touch /var/backups/wmau-db.sql.gz
+    chmod 0600 /var/backups/wmau-db.sql.gz
+    mysqldump --databases blog_wikimedia_org_au civicrm_db_wikimedia_org_au civicrm_wikimedia_org_au wikimaus_commwikidb wikimaus_officialwikidb wikimedia_org_au | gzip >> /var/backups/wmau-db.sql.gz
+  endscript
+}
+

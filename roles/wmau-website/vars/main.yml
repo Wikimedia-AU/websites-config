@@ -1,0 +1,33 @@
+
+# List of extensions that use the same branch name as MediaWiki release,
+#  and are located at https://gerrit.wikimedia.org/r/mediawiki/extensions/xyz
+extensions:
+ - Cite
+ - ConfirmAccount
+ - ConfirmEdit
+ - InputBox
+ - Interwiki
+ - Interwiki
+ - MwEmbedSupport
+ - News
+ - ParserFunctions
+ - PdfHandler
+ - Poem
+ - Renameuser
+ - TimedMediaHandler
+ - UploadLocal
+ - Vector
+ - WikiEditor
+
+# Handle externally hosted or version non-compliant extensions.
+# This is not currently used but is kept for possible future use.
+extensions_extra:
+ - {
+    repo: 'https://gerrit.wikimedia.org/r/mediawiki/extensions/ConfirmEdit',
+    dest: 'extensions/ConfirmEdit',
+    version: 'REL1_28'
+    }
+
+skins:
+ - Modern
+ - Vector

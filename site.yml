@@ -1,0 +1,21 @@
+---
+- name: Webserver
+  hosts:
+   - web
+  become: yes
+  roles:
+    - common
+    - nginx
+    - apache-web
+    - mariadb
+    - wmau-website
+
+# Commented out to avoid confusion. This server is not deployed at this time.
+# - name: Monitoring server
+#   hosts: backup
+#   become: yes
+#   roles:
+#     - common
+#     - mariadb
+#     - apache-web
+# #    - icinga

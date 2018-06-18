@@ -1,0 +1,240 @@
+<?php
+
+$wgSitename         = "Comm";
+$wgServer           = "https://comm.{{ wmau_domain }}";
+
+## The URL base path to the directory containing the wiki;
+## defaults for all runtime URL paths are based off of this.
+$wgScriptPath = "/w";         # Path to the actual files (right part of first rewrite rule). Should already be there
+$wgArticlePath = "/wiki/$1";  # Virtual path (left part of first rewrite rule). MUST be DIFFERENT from the path above!
+$wgScriptExtension  = ".php";
+
+## For more information on customizing the URLs please see:
+## http://www.mediawiki.org/wiki/Manual:Short_URL
+
+$wgEnableEmail      = true;
+$wgEnableUserEmail  = true;
+
+$wgEmergencyContact = "tech@wikimedia.org.au";
+$wgPasswordSender = "tech@wikimedia.org.au";
+
+## For a detailed description of the following switches see
+## http://www.mediawiki.org/wiki/Extension:Email_notification 
+## and http://www.mediawiki.org/wiki/Extension:Email_notification
+## There are many more options for fine tuning available see
+## /includes/DefaultSettings.php
+## UPO means: this is also a user preference option
+$wgEnotifUserTalk = true; # UPO
+$wgEnotifWatchlist = true; # UPO
+$wgEmailAuthentication = false;
+
+$wgDBtype           = "mysql";
+$wgDBserver         = "localhost";
+$wgDBname           = "{{ commwiki_db }}";
+$wgDBuser           = "{{ commwiki_db_user }}";
+$wgDBpassword       = "{{ commwiki_db_pass }}";
+
+# MySQL specific settings
+$wgDBprefix         = "";
+
+# MySQL table options to use during installation or update
+$wgDBTableOptions   = "TYPE=InnoDB";
+
+# Experimental charset support for MySQL 4.1/5.0.
+$wgDBmysql5 = false;
+
+# Postgres specific settings
+$wgDBport           = "5432";
+$wgDBmwschema       = "mediawiki";
+$wgDBts2schema      = "public";
+
+## Shared memory settings
+$wgMainCacheType = CACHE_NONE;
+$wgMemCachedServers = array();
+
+## To enable image uploads, make sure the 'images' directory
+## is writable, then set this to true:
+$wgEnableUploads       = true;
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = "/usr/bin/convert";
+
+## If you want to use image uploads under safe mode,
+## create the directories images/archive, images/thumb and
+## images/temp, and make them all writable. Then uncomment
+## this, if it's not already uncommented:
+# $wgHashedUploadDirectory = false;
+
+## If you have the appropriate support software installed
+## you can enable inline LaTeX equations:
+$wgUseTeX           = false;
+
+$wgLocalInterwiki   = $wgSitename;
+
+$wgLanguageCode = "en";
+
+$wgProxyKey = "{{ commwiki_proxy_key }}";
+
+## Default skin: you can change the default skin. Use the internal symbolic
+## names, ie 'standard', 'nostalgia', 'cologneblue', 'monobook':
+$wgDefaultSkin = 'vector';
+
+## For attaching licensing metadata to pages, and displaying an
+## appropriate copyright notice / icon. GNU Free Documentation
+## License and Creative Commons licenses are supported so far.
+$wgEnableCreativeCommonsRdf = false;
+$wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
+
+$wgRightsUrl = "";
+$wgRightsText = "";
+$wgRightsIcon = "";
+#$wgRightsUrl = "http://www.gnu.org/copyleft/fdl.html";
+#$wgRightsText = "GNU Free Documentation License 1.2";
+#$wgRightsIcon = "${wgScriptPath}/skins/common/images/gnu-fdl.png";
+# $wgRightsCode = "gfdl"; # Not yet used
+
+$wgDiff3 = "/usr/bin/diff3";
+
+$wgEnableAPI = false;
+$wgUseInstantCommons = true;
+
+define("NS_MEETING", 200);
+define("NS_MEETING_TALK", 201);
+define("NS_RESOLUTION", 202);
+define("NS_RESOLUTION_TALK", 203);
+define("NS_PROPOSAL", 204);
+define("NS_PROPOSAL_TALK", 205);
+
+# fun stuff
+/** Allow for upload to be copied from an URL. Requires Special:Upload?source=web */
+$wgAllowCopyUploads = true;
+
+$wgGroupPermissions['*'    ]['createaccount']    = false;
+$wgGroupPermissions['*'    ]['read']             = false;
+
+$wgGroupPermissions['current'] = $wgGroupPermissions['user'];
+$wgGroupPermissions['user'] = array();
+$wgGroupPermissions['current' ]['createaccount']    = true;
+$wgGroupPermissions['current']['editinterface']    = true;
+
+// Permission to change users' group assignments
+$wgGroupPermissions['sysop']['userrights']  = true;
+/**
+ * This is the list of preferred extensions for uploading files. Uploading files
+ * with extensions not in this list will trigger a warning.
+ */
+$wgFileExtensions = array( 'png', 'gif', 'jpg', 'jpeg','svg','odt','pdf','ods','odp','odg','ogg','ogm','wav','m4a','gnumeric','ppt','psd', 'mp3','xls','xlsx','swf','doc','docx','mpp','sla' );
+$wgMaxUploadSize = 1024*1024*100;
+$wgAllowJavaUploads = true;
+
+$wgExtraNamespaces[NS_MEETING] = "Meeting";
+$wgExtraNamespaces[NS_MEETING_TALK] = "Meeting_talk";
+$wgExtraNamespaces[NS_RESOLUTION] = "Resolution";
+$wgExtraNamespaces[NS_RESOLUTION_TALK] = "Resolution_talk";
+$wgExtraNamespaces[NS_PROPOSAL] = "Proposal";
+$wgExtraNamespaces[NS_PROPOSAL_TALK] = "Proposal_talk";
+
+$wgContentNamespaces = array(0,NS_MEETING,NS_RESOLUTION,NS_PROPOSAL);
+
+$wgNamespacesToBeSearchedDefault = array(
+        NS_MAIN =>           true,
+        NS_TALK =>           true,
+        NS_USER =>           true,
+        NS_USER_TALK =>      true,
+        NS_PROJECT =>        true,
+        NS_PROJECT_TALK =>   true,
+        NS_IMAGE =>          false,
+        NS_IMAGE_TALK =>     false,
+        NS_MEDIAWIKI =>      false,
+        NS_MEDIAWIKI_TALK => false,
+        NS_TEMPLATE =>       false,
+        NS_TEMPLATE_TALK =>  false,
+        NS_HELP =>           false,
+        NS_HELP_TALK =>      false,
+        NS_CATEGORY =>       true,
+        NS_CATEGORY_TALK =>  false,
+        NS_MEETING =>        true,
+        NS_MEETING_TALK =>   true,
+        NS_RESOLUTION =>     true,
+        NS_RESOLUTION_TALK => true,
+	NS_PROPOSAL =>       true,
+	NS_PROPOSAL =>       true
+);
+
+/** Which namespaces should support subpages?
+ * See Language.php for a list of namespaces.
+ */
+$wgNamespacesWithSubpages = array(
+    NS_MAIN           => true,
+    NS_TALK           => true,
+    NS_USER           => true,
+    NS_USER_TALK      => true,
+    NS_PROJECT        => true,
+    NS_PROJECT_TALK   => true,
+    NS_IMAGE_TALK     => true,
+    NS_MEDIAWIKI_TALK => true,
+    NS_TEMPLATE_TALK  => true,
+    NS_HELP_TALK      => true,
+    NS_CATEGORY_TALK  => true,
+    NS_MEETING        => true,
+    NS_MEETING_TALK   => true,
+    NS_RESOLUTION     => true,
+    NS_RESOLUTION_TALK => true
+);
+
+$wgUploadPath =  "{$wgScriptPath}/images";
+$wgLogo = "{$wgUploadPath}/c/c9/Logo.png";
+
+require_once("$IP/extensions/Cite/Cite.php");
+
+require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
+$wgPFEnableStringFunctions = true;
+
+# http://www.mediawiki.org/wiki/Extension:SpecialInterwiki#Installation
+require_once('extensions/Interwiki/Interwiki.php');
+$wgGroupPermissions['*']['interwiki'] = false;
+$wgGroupPermissions['user']['interwiki'] = true;
+
+//require_once("$IP/extensions/Renameuser/Renameuser.php");
+
+# http://www.mediawiki.org/wiki/Extension:EditUser
+//require_once("$IP/extensions/EditUser/EditUser.php");
+$wgGroupPermissions['user']['edituser'] = false;
+$wgGroupPermissions['sysop']['edituser'] = true;
+$wgGroupPermissions['user']['edituser-exempt'] = false;
+$wgGroupPermissions['sysop']['edituser-exempt'] = true;
+#$wgEditUserDebug = true;
+#$wgEditUserDebugLog = "$IP/extensions/EditUser/debug.log"; #optional, defaults to $IP/extensions/debug.log
+
+
+
+# http://www.mediawiki.org/wiki/Extension:Password_Reset
+$wgGroupPermissions['sysop']['passwordreset']   = true;
+//require_once( "$IP/extensions/PasswordReset/PasswordReset.php" );
+
+#$wgReadOnly = 'Moving to another server. Should be done in a few hours.';
+
+$wgLocaltimezone = 'Australia/Sydney';
+$oldtz = getenv("TZ");
+putenv("TZ=$wgLocaltimezone");
+# Versions before 1.7.0 used $wgLocalTZoffset as hours.
+# After 1.7.0 offset as minutes
+$wgLocalTZoffset = date("Z") / 60;
+putenv("TZ=$oldtz");
+   
+require_once( "$IP/extensions/PdfHandler/PdfHandler.php" );
+
+#require_once( "$IP/extensions/SpecialCalendar.php" );
+
+$wgICalenarVersion = '2.0';
+$wgICalenarPerodID = '-//Fabricants de Joie//NONSGML mediawiki//FR';
+$wgICalenarDefaultPage = 'Calendar';
+
+//require_once ( "$IP/extensions/ContributionReporting/ContributionReporting.php" );
+
+# TODO was enabled on commwiki 2015-12-30
+#require_once( "$IP/extensions/UploadLocal/UploadLocal.php" );
+
+# TODO was enabled on commwiki 2015-12-30
+# require_once "$IP/extensions/UserMerge/UserMerge.php";
+$wgGroupPermissions['bureaucrat']['usermerge'] = true;
+$wgUserMergeProtectedGroups = array( 'current', 'sysop', 'bureaucrat');
