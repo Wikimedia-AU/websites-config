@@ -18,6 +18,8 @@ extensions:
  - UploadLocal
  - Vector
  - WikiEditor
+ - Cargo
+ - PageForms
 
 # Handle externally hosted or version non-compliant extensions.
 # This is not currently used but is kept for possible future use.

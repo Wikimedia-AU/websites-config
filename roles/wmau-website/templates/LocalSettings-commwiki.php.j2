@@ -94,7 +94,7 @@ $wgRightsIcon = "";
 
 $wgDiff3 = "/usr/bin/diff3";
 
-$wgEnableAPI = false;
+$wgEnableAPI = true;
 $wgUseInstantCommons = true;
 
 define("NS_MEETING", 200);
@@ -238,3 +238,8 @@ $wgICalenarDefaultPage = 'Calendar';
 # require_once "$IP/extensions/UserMerge/UserMerge.php";
 $wgGroupPermissions['bureaucrat']['usermerge'] = true;
 $wgUserMergeProtectedGroups = array( 'current', 'sysop', 'bureaucrat');
+
+wfLoadExtension( 'Cargo' );
+$wgCargoAllowedSQLFunctions = array_merge( $wgCargoAllowedSQLFunctions, [ 'ADDTIME', 'CURDATE', 'IF' ] );
+
+wfLoadExtension( 'PageForms' );
